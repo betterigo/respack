@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.troila.cloud</groupId>
-	<artifactId>respack</artifactId>
+	<artifactId>spring-boot-starter-respack</artifactId>
 	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
