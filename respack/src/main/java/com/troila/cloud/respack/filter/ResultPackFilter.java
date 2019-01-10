@@ -73,6 +73,9 @@ public class ResultPackFilter extends OncePerRequestFilter{
 				JsonNode root = mapper.readTree(result);
 				PackEntity entity = resultPackager.pack(respAttrs,root);
 				response.getOutputStream().write(mapper.writeValueAsBytes(entity));
+			}else {
+				//返回值不是json格式
+				wrapper.flushCacheStream();
 			}
 		}else {
 			filterChain.doFilter(request, response);

@@ -2,9 +2,7 @@ package com.troila.cloud.respack.filter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
@@ -35,15 +33,15 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     	return filterOutput;
     }
   
-    @Override
-    public PrintWriter getWriter() throws IOException {
-        try{
-        	printWriter = new PrintWriter(new OutputStreamWriter(bytes, "utf-8"));
-        } catch(UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return printWriter;
-    }
+//    @Override
+//    public PrintWriter getWriter() throws IOException {
+//        try{
+//        	printWriter = new PrintWriter(new OutputStreamWriter(bytes, "utf-8"));
+//        } catch(UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//        return printWriter;
+//    }
 
     public byte[] getBytes() {
         if(printWriter != null) {
@@ -61,13 +59,8 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
         return bytes.toByteArray();
     }
     
-    public void writeFileStream(HttpServletResponse response) throws IOException {
-//    	response.addIntHeader("Content-Length", bytes.size());
-//    	ServletOutputStream os = response.getOutputStream();
-//    	bytes.writeTo(os);
-//    	os.w
-//    	this.servletOutputStream.
-    	this.servletOutputStream.flush();
+    public void flushCacheStream() throws IOException {
+    	this.servletOutputStream.write(bytes.toByteArray());
     }
 
     class MyServletOutputStream extends ServletOutputStream {
@@ -99,7 +92,7 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
 
 		@Override
         public void write(int b) throws IOException {
-			//应该设定os最大读取的字节数。避免oom
+			//应该设定os最大读取的字节数。避免oom,os.toByteArray()后size是否发生变化？
 			if(os.size()<TOTAL_SIZE) {				
 				os.write(b);//此处需要判断是否是json字符串,如果不是json，那么也需要直接使用servletOutputStream输出
 			}else {
