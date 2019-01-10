@@ -5,7 +5,7 @@
 
 	<groupId>com.troila.cloud</groupId>
 	<artifactId>respack</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>respack</name>
@@ -26,6 +26,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
+			<version>${spring.version}</version>
+		</dependency>
+			<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
@@ -51,4 +56,35 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+		<distributionManagement>
+		<snapshotRepository>
+			<id>localNexus</id>
+			<name>Nexus Snapshot</name>
+			<url>http://172.27.103.22:8081/repository/local-snapshot-repository/</url>
+		</snapshotRepository>
+		<repository>
+			<id>localNexus</id>
+			<url>http://172.27.103.22:8081/repository/local-release/</url>
+		</repository>
+	</distributionManagement>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+				<executions>
+                  <execution>
+                      <id>attach-sources</id>
+                      <goals>
+                          <goal>jar</goal>
+                      </goals>
+                  </execution>
+              </executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
