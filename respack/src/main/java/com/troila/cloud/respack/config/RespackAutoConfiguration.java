@@ -23,7 +23,6 @@ import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -97,10 +96,10 @@ public class RespackAutoConfiguration {
 		public FilterRegistrationBean<Filter> createFilter() {
 			logger.info("创建结果集包装器filter");
 			ResultPackFilter filter = new ResultPackFilter(attrsSelector, resultPackager,
-					filterSettings.getIgnorePathsList());
+					filterSettings);
 			FilterRegistrationBean<Filter> register = new FilterRegistrationBean<Filter>();
 			register.setFilter(filter);
-			register.setOrder(Ordered.LOWEST_PRECEDENCE);
+			register.setOrder(filterSettings.getFilterOrder());
 			return register;
 		}
 	}

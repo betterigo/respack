@@ -2,7 +2,9 @@ package com.troila.cloud.respack.filter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
@@ -17,11 +19,13 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     private ServletOutputStream filterOutput;
     private ServletOutputStream servletOutputStream;
     private boolean hasWriteBytes = false;
+    private int maxCache = 1024;
     
-    public ResponseWrapper(HttpServletResponse response) {
+    public ResponseWrapper(HttpServletResponse response,int maxCache) {
         super(response);
         try {
 			this.servletOutputStream = response.getOutputStream();
+			this.maxCache = maxCache;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -33,15 +37,15 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     	return filterOutput;
     }
   
-//    @Override
-//    public PrintWriter getWriter() throws IOException {
-//        try{
-//        	printWriter = new PrintWriter(new OutputStreamWriter(bytes, "utf-8"));
-//        } catch(UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//        return printWriter;
-//    }
+    @Override
+    public PrintWriter getWriter() throws IOException {
+        try{
+        	printWriter = new PrintWriter(new OutputStreamWriter(bytes, "utf-8"));
+        } catch(UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return printWriter;
+    }
 
     public byte[] getBytes() {
         if(printWriter != null) {
@@ -60,12 +64,12 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     }
     
     public void flushCacheStream() throws IOException {
-    	this.servletOutputStream.write(bytes.toByteArray());
+    	this.servletOutputStream.write(getBytes());
     }
 
     class MyServletOutputStream extends ServletOutputStream {
     	
-    	private static final int TOTAL_SIZE = 1 * 1024 * 1024;//1m的json字符串长度限制
+    	private final int TOTAL_SIZE = maxCache * 1024;//1m的json字符串长度限制
     	
         private ByteArrayOutputStream os ;
 

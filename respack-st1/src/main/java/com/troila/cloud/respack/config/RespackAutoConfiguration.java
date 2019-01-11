@@ -22,7 +22,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -96,10 +95,10 @@ public class RespackAutoConfiguration {
 		public FilterRegistrationBean createFilter() {
 			logger.info("创建结果集包装器filter");
 			ResultPackFilter filter = new ResultPackFilter(attrsSelector, resultPackager,
-					filterSettings.getIgnorePathsList());
+					filterSettings);
 			FilterRegistrationBean register = new FilterRegistrationBean();
 			register.setFilter(filter);
-			register.setOrder(Ordered.LOWEST_PRECEDENCE);
+			register.setOrder(filterSettings.getFilterOrder());
 			return register;
 		}
 	}

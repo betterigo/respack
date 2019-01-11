@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.troila.cloud.respack.config.settings.FilterSettings;
 import com.troila.cloud.respack.core.AttrsSelector;
 import com.troila.cloud.respack.core.PackEntity;
 import com.troila.cloud.respack.core.RespAttrs;
@@ -35,13 +36,18 @@ public class ResultPackFilter extends OncePerRequestFilter{
 	
 	private List<String> ignorePaths;
 	
+	private FilterSettings filterSettings;
+	
 	ObjectMapper mapper = new ObjectMapper();
 	
-	public ResultPackFilter(AttrsSelector attrsSelector, ResultPackager resultPackager, List<String> ignorePaths) {
+	public ResultPackFilter(AttrsSelector attrsSelector, ResultPackager resultPackager, FilterSettings filterSettings) {
 		super();
 		this.attrsSelector = attrsSelector;
 		this.resultPackager = resultPackager;
-		this.ignorePaths = ignorePaths;
+		this.filterSettings = filterSettings;
+		if(filterSettings!=null) {
+			this.ignorePaths = filterSettings.getIgnorePathsList();
+		}
 	}
 
 	@Override
@@ -50,7 +56,7 @@ public class ResultPackFilter extends OncePerRequestFilter{
 		String uri = request.getRequestURI();
 		boolean hasError = false;
 		if(!matchUri(uri)) {			
-			ResponseWrapper wrapper = new ResponseWrapper(response);
+			ResponseWrapper wrapper = new ResponseWrapper(response,filterSettings.getMaxCache());
 			RespAttrs respAttrs = null;
 			try {
 				filterChain.doFilter(request, wrapper);
@@ -61,7 +67,7 @@ public class ResultPackFilter extends OncePerRequestFilter{
 				if(e.getCause() instanceof BaseErrorException) {
 					hasError = true;
 					BaseErrorException be = (BaseErrorException)e.getCause();
-					logger.info("error_code:{}",be.getErrorCode());
+					logger.info("path:{} => error_code:{}",uri,be.getErrorCode());
 					respAttrs = attrsSelector.selectExceptionAtts(wrapper, be);
 				}else {
 					throw e;

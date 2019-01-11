@@ -15,6 +15,11 @@
     },
     {
       "sourceType": "com.troila.cloud.respack.config.settings.FilterSettings",
+      "name": "respack.filter.settings.filter-order",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.troila.cloud.respack.config.settings.FilterSettings",
       "name": "respack.filter.settings.ignore-paths",
       "type": "java.lang.String"
     },
@@ -22,6 +27,11 @@
       "sourceType": "com.troila.cloud.respack.config.settings.FilterSettings",
       "name": "respack.filter.settings.ignore-paths-list",
       "type": "java.util.List<java.lang.String>"
+    },
+    {
+      "sourceType": "com.troila.cloud.respack.config.settings.FilterSettings",
+      "name": "respack.filter.settings.max-cache",
+      "type": "java.lang.Integer"
     }
   ]
 }
