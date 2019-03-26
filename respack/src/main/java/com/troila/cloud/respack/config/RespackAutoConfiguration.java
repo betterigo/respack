@@ -1,6 +1,7 @@
 package com.troila.cloud.respack.config;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -28,13 +29,19 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.protobuf.Message;
 import com.troila.cloud.respack.config.settings.FilterSettings;
 import com.troila.cloud.respack.core.AttrsSelector;
 import com.troila.cloud.respack.core.ErrorBody;
 import com.troila.cloud.respack.core.ResultPackager;
 import com.troila.cloud.respack.core.impl.DefaultAttrsSelector;
 import com.troila.cloud.respack.core.impl.DefaultResultPackager;
+import com.troila.cloud.respack.core.impl.proto.ProtoResultPackager;
 import com.troila.cloud.respack.filter.ResultPackFilter;
+import com.troila.cloud.respack.filter.converter.ResultPackConverter;
+import com.troila.cloud.respack.filter.converter.packconverter.JsonResultPackConverter;
+import com.troila.cloud.respack.filter.converter.packconverter.ProtoResultPackConverter;
 
 @Configuration
 @EnableConfigurationProperties({ FilterSettings.class })
@@ -69,14 +76,31 @@ public class RespackAutoConfiguration {
 	 *
 	 */
 	@Configuration
-	@ConditionalOnMissingBean(value = ResultPackager.class)
+	@ConditionalOnMissingBean(value = ResultPackConverter.class)
 	static class InnerConfig2 {
 
 		@Bean
-		public ResultPackager createResultPackager() {
-			ResultPackager resultPackager = new DefaultResultPackager();
-			logger.info("配置默认结果集包装器");
+		public ResultPackager<JsonNode> createResultPackager() {
+			ResultPackager<JsonNode> resultPackager = new DefaultResultPackager();
+			logger.info("配置application/json结果集包装器");
 			return resultPackager;
+		}
+		
+		@Bean
+		public ResultPackager<Message> createProtoResultPackager(){
+			ResultPackager<Message> resultPackager = new ProtoResultPackager();
+			logger.info("配置application/x-protobuf结果集包装器");
+			return resultPackager;
+		}
+		
+		
+		@Bean
+		public JsonResultPackConverter createJsonResultPackConverter() {
+			return new JsonResultPackConverter(createResultPackager());
+		}
+		@Bean
+		public ProtoResultPackConverter createProtoResultPackConverter() {
+			return new ProtoResultPackConverter(createProtoResultPackager());
 		}
 	}
 
@@ -87,15 +111,15 @@ public class RespackAutoConfiguration {
 		private AttrsSelector attrsSelector;
 
 		@Autowired
-		private ResultPackager resultPackager;
-
+		private List<ResultPackConverter> resultPackConverters;
+		
 		@Autowired
 		private FilterSettings filterSettings;
 
 		@Bean
 		public FilterRegistrationBean<Filter> createFilter() {
 			logger.info("创建结果集包装器filter");
-			ResultPackFilter filter = new ResultPackFilter(attrsSelector, resultPackager,
+			ResultPackFilter filter = new ResultPackFilter(attrsSelector, resultPackConverters,
 					filterSettings);
 			FilterRegistrationBean<Filter> register = new FilterRegistrationBean<Filter>();
 			register.setFilter(filter);

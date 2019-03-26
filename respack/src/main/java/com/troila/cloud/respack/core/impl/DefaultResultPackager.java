@@ -13,7 +13,7 @@ import com.troila.cloud.respack.core.StandardPackEntity;
  * @author haodonglei
  *
  */
-public class DefaultResultPackager implements ResultPackager{
+public class DefaultResultPackager implements ResultPackager<JsonNode>{
 
 	@Override
 	public PackEntity pack(RespAttrs attrs, JsonNode data) {

@@ -1,5 +1,7 @@
 package com.troila.cloud.respack.core.impl;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.troila.cloud.respack.core.RespAttrs;
 
 public class DefaultRespAttrs implements RespAttrs{
@@ -8,6 +10,8 @@ public class DefaultRespAttrs implements RespAttrs{
 	
 	private int errCode;
 
+	private ConcurrentHashMap<String, String> extInfo = new ConcurrentHashMap<>();
+	
 	@Override
 	public int getStatus() {
 		return status;
@@ -25,4 +29,11 @@ public class DefaultRespAttrs implements RespAttrs{
 		this.status = status;
 	}
 
+	public void setExtInfo(String k,String v) {
+		this.extInfo.put(k, v);
+	}
+	
+	public String getExtInfo(String k) {
+		return this.extInfo.get(k);
+	}
 }
