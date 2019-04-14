@@ -34,7 +34,7 @@ public abstract class AbstractResultPackConverter<T> implements ResultPackConver
 	@Override
 	public boolean canPack(String mediaType) {
 		return this.supportsMediaTypes.stream().anyMatch(m->{
-			return mediaType!=null && m.contains(mediaType);
+			return mediaType!=null && m.equals(mediaType);
 			});
 	}
 	

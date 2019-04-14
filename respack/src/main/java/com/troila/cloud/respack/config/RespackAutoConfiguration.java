@@ -30,7 +30,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.protobuf.Message;
 import com.troila.cloud.respack.config.settings.FilterSettings;
 import com.troila.cloud.respack.core.AttrsSelector;
 import com.troila.cloud.respack.core.ErrorBody;
@@ -87,8 +86,8 @@ public class RespackAutoConfiguration {
 		}
 		
 		@Bean
-		public ResultPackager<Message> createProtoResultPackager(){
-			ResultPackager<Message> resultPackager = new ProtoResultPackager();
+		public ResultPackager<byte[]> createProtoResultPackager(){
+			ResultPackager<byte[]> resultPackager = new ProtoResultPackager();
 			logger.info("配置application/x-protobuf结果集包装器");
 			return resultPackager;
 		}

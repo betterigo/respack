@@ -76,6 +76,9 @@ public class ResultPackFilter extends OncePerRequestFilter {
 			}
 			boolean hasPack = false;
 			String contentType = request.getHeader("Accept");
+			if(contentType != null && contentType.equals("*/*")) {
+				contentType = request.getContentType();
+			}
 			for (ResultPackConverter converter : this.resultPackConverters) {
 				if (converter.canPack(contentType)) {
 					converter.packResult(wrapper, response, respAttrs);

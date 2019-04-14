@@ -3,15 +3,13 @@ package com.troila.cloud.respack.filter.converter.packconverter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import com.google.protobuf.Any;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.troila.cloud.respack.core.PackEntity;
 import com.troila.cloud.respack.core.RespAttrs;
 import com.troila.cloud.respack.core.ResultPackager;
 import com.troila.cloud.respack.filter.converter.AbstractResultPackConverter;
 
-public class ProtoResultPackConverter extends AbstractResultPackConverter<Message>{
+public class ProtoResultPackConverter extends AbstractResultPackConverter<byte[]>{
 
 	//定义默认编码类型
 	public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
@@ -22,7 +20,7 @@ public class ProtoResultPackConverter extends AbstractResultPackConverter<Messag
 	}
 
 	
-	public ProtoResultPackConverter(ResultPackager<Message> resultPackager) {
+	public ProtoResultPackConverter(ResultPackager<byte[]> resultPackager) {
 		super(resultPackager);
 		this.initSupportMediaTypes();
 	}
@@ -31,13 +29,8 @@ public class ProtoResultPackConverter extends AbstractResultPackConverter<Messag
 	}
 	@Override
 	protected byte[] packInternal(byte[] buffer, RespAttrs respAttrs) {
-		Message.Builder builder = Any.newBuilder();
-		try {
-			builder = builder.mergeFrom(buffer);
-		} catch (InvalidProtocolBufferException e) {
-			e.printStackTrace();
-		}
-		PackEntity entity = getResultPackager().pack(respAttrs, builder.build());
+		
+		PackEntity entity = getResultPackager().pack(respAttrs, buffer);
 		Message message = (Message) entity.getData();
 		return message.toByteArray();
 	}

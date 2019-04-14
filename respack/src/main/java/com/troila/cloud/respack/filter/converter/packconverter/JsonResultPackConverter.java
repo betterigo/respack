@@ -31,7 +31,7 @@ public class JsonResultPackConverter extends AbstractResultPackConverter<JsonNod
 	}
 
 	private void initSupportMediaTypes() {
-		this.setSupportMediaTypes("application/json");
+		this.setSupportMediaTypes("application/json","application/x-protobuf-json");
 	}
 
 	@Override

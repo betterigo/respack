@@ -1,26 +1,26 @@
 package com.troila.cloud.respack.core.impl.proto;
 
-import com.google.protobuf.Any;
-import com.google.protobuf.Message;
+import com.google.protobuf.ByteString;
 import com.troila.cloud.respack.core.PackEntity;
 import com.troila.cloud.respack.core.RespAttrs;
 import com.troila.cloud.respack.core.ResultPackager;
 import com.troila.cloud.respack.core.StandardPackEntity;
 import com.troila.cloud.respack.core.impl.DefaultRespAttrs;
+import com.troila.cloud.respack.core.impl.proto.RespackProto.Respack;
 
-public class ProtoResultPackager implements ResultPackager<Message>{
+public class ProtoResultPackager implements ResultPackager<byte[]>{
 
 	@Override
-	public PackEntity pack(RespAttrs attrs, Message data) {
+	public PackEntity pack(RespAttrs attrs, byte[] data) {
 		Respack.Builder builder = Respack.newBuilder();
 		builder.setStatus(attrs.getStatus());
 		if(attrs instanceof DefaultRespAttrs) {
 			builder.setErrCode(((DefaultRespAttrs) attrs).getErrCode());
 		}
-		Any.Builder anyBuilder = Any.newBuilder();
-		anyBuilder.setValue(data.toByteString());
-		anyBuilder.setTypeUrl(attrs.getExtInfo("X-Protobuf-Message"));
-		builder.setData(anyBuilder.build());
+//		Any.Builder anyBuilder = Any.newBuilder();
+//		anyBuilder.setValue(data.toByteString());
+		builder.setTypeUrl(attrs.getExtInfo("X-Protobuf-Message"));
+		builder.setData(ByteString.copyFrom(data));
 		StandardPackEntity entity = new StandardPackEntity();
 		entity.setData(builder.build());
 		return entity;
