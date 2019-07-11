@@ -2,7 +2,8 @@ package com.troila.cloud.respack.core;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.troila.cloud.dev.common.exception.BaseErrorException;
+import com.troila.cloud.respack.exception.BaseErrorException;
+
 
 public interface AttrsSelector {
 	<T extends RespAttrs> T selectResponseAtts(HttpServletResponse response);

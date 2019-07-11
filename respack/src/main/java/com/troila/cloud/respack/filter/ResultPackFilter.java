@@ -14,10 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.troila.cloud.dev.common.exception.BaseErrorException;
 import com.troila.cloud.respack.config.settings.FilterSettings;
 import com.troila.cloud.respack.core.AttrsSelector;
 import com.troila.cloud.respack.core.RespAttrs;
+import com.troila.cloud.respack.exception.BaseErrorException;
 import com.troila.cloud.respack.filter.converter.ResultPackConverter;
 
 /**
@@ -55,7 +55,20 @@ public class ResultPackFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		String uri = request.getRequestURI();
-		if (!matchUri(uri)) {
+		
+		String contentType = request.getHeader("Accept");
+		if(contentType != null && contentType.equals("*/*")) {
+			contentType = request.getContentType();
+		}
+		ResultPackConverter targetConverter = null;
+		for (ResultPackConverter converter : this.resultPackConverters) {
+			if (converter.canPack(contentType)) {
+				targetConverter = converter;
+				break;
+			}
+		}
+		
+		if (!matchUri(uri) && targetConverter!=null) {
 			ResponseWrapper wrapper = new ResponseWrapper(response, filterSettings.getMaxCache());
 			RespAttrs respAttrs = null;
 			try {
@@ -75,17 +88,8 @@ public class ResultPackFilter extends OncePerRequestFilter {
 				}
 			}
 			boolean hasPack = false;
-			String contentType = request.getHeader("Accept");
-			if(contentType != null && contentType.equals("*/*")) {
-				contentType = request.getContentType();
-			}
-			for (ResultPackConverter converter : this.resultPackConverters) {
-				if (converter.canPack(contentType)) {
-					converter.packResult(wrapper, response, respAttrs);
-					hasPack = true;
-					break;
-				}
-			}
+			targetConverter.packResult(wrapper, response, respAttrs);
+			hasPack = true;
 			// 获取返回的消息体 目前只处理application/json,application/x-protobuf类型
 			if (!hasPack) {
 				Class<?> clazz = response.getClass();

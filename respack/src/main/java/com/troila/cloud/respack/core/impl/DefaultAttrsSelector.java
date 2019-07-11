@@ -2,9 +2,9 @@ package com.troila.cloud.respack.core.impl;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.troila.cloud.dev.common.exception.BaseErrorException;
 import com.troila.cloud.respack.core.AttrsSelector;
 import com.troila.cloud.respack.core.RespAttrs;
+import com.troila.cloud.respack.exception.BaseErrorException;
 
 public class DefaultAttrsSelector implements AttrsSelector{
 
