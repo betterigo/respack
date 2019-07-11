@@ -19,7 +19,9 @@ public class ProtoResultPackager implements ResultPackager<byte[]>{
 		}
 //		Any.Builder anyBuilder = Any.newBuilder();
 //		anyBuilder.setValue(data.toByteString());
-		builder.setTypeUrl(attrs.getExtInfo("X-Protobuf-Message"));
+		if(attrs.getExtInfo("X-Protobuf-Message")!=null) {			
+			builder.setTypeUrl(attrs.getExtInfo("X-Protobuf-Message"));
+		}
 		builder.setData(ByteString.copyFrom(data));
 		StandardPackEntity entity = new StandardPackEntity();
 		entity.setData(builder.build());

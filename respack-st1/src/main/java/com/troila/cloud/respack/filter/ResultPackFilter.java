@@ -1,6 +1,7 @@
 package com.troila.cloud.respack.filter;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 
 import javax.servlet.FilterChain;
@@ -23,29 +24,30 @@ import com.troila.cloud.respack.exception.BaseErrorException;
 
 /**
  * 该filter将负责包装返回结果
+ * 
  * @author haodonglei
  *
  */
-public class ResultPackFilter extends OncePerRequestFilter{
+public class ResultPackFilter extends OncePerRequestFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ResultPackFilter.class);
-	
+
 	private AttrsSelector attrsSelector;
-	
+
 	private ResultPackager resultPackager;
-	
+
 	private List<String> ignorePaths;
-	
+
 	private FilterSettings filterSettings;
-	
+
 	ObjectMapper mapper = new ObjectMapper();
-	
+
 	public ResultPackFilter(AttrsSelector attrsSelector, ResultPackager resultPackager, FilterSettings filterSettings) {
 		super();
 		this.attrsSelector = attrsSelector;
 		this.resultPackager = resultPackager;
 		this.filterSettings = filterSettings;
-		if(filterSettings!=null) {
+		if (filterSettings != null) {
 			this.ignorePaths = filterSettings.getIgnorePathsList();
 		}
 	}
@@ -55,42 +57,77 @@ public class ResultPackFilter extends OncePerRequestFilter{
 			throws ServletException, IOException {
 		String uri = request.getRequestURI();
 		boolean hasError = false;
-		if(!matchUri(uri)) {			
-			ResponseWrapper wrapper = new ResponseWrapper(response,filterSettings.getMaxCache());
+		if (!matchUri(uri)) {
+			ResponseWrapper wrapper = new ResponseWrapper(response, filterSettings.getMaxCache());
 			RespAttrs respAttrs = null;
 			try {
 				filterChain.doFilter(request, wrapper);
-				//后续操作
-				//1.获取response中的属性信息
+				// 后续操作
+				// 1.获取response中的属性信息
 				respAttrs = attrsSelector.selectResponseAtts(wrapper);
 			} catch (Exception e) {
-				if(e.getCause() instanceof BaseErrorException) {
+				if (e.getCause() instanceof BaseErrorException) {
 					hasError = true;
-					BaseErrorException be = (BaseErrorException)e.getCause();
-					logger.info("path:{} => error_code:{}",uri,be.getErrorCode());
-					respAttrs = attrsSelector.selectExceptionAtts(wrapper, be);
-				}else {
+					BaseErrorException be = (BaseErrorException) e.getCause();
+					respAttrs = initRespAttrs(uri, wrapper, be);
+				} else if (e instanceof BaseErrorException) {
+					hasError = true;
+					BaseErrorException be = (BaseErrorException) e;
+					respAttrs = initRespAttrs(uri, wrapper, be);
+				} else {
 					throw e;
 				}
 			}
-			//获取返回的消息体 目前只处理application/json类型
-			if(response.getContentType() != null && response.getContentType().contains("application/json") || hasError) {				
-				String result = new String(wrapper.getBytes(),"utf-8");
-				JsonNode root = mapper.readTree(result);
-				PackEntity entity = resultPackager.pack(respAttrs,root);
+			// 获取返回的消息体 目前只处理application/json类型
+			if (response.getContentType() != null && response.getContentType().contains("application/json")
+					|| hasError) {
+				String result = new String(wrapper.getBytes(), "utf-8");
+				JsonNode root = null;
+				try {
+					root = mapper.readTree(result);
+				} catch (Exception e) {
+				}
+				PackEntity entity = resultPackager.pack(respAttrs, root);
 				response.getOutputStream().write(mapper.writeValueAsBytes(entity));
-			}else {
-				//返回值不是json格式
-				wrapper.flushCacheStream();
+			} else {
+				// 返回值不是json格式
+				Class<?> clazz = response.getClass();
+				if (clazz.getName().equals("io.undertow.servlet.spec.HttpServletResponseImpl")) {//处理undertow
+					try {
+						Field f = clazz.getDeclaredField("treatAsCommitted");
+						f.setAccessible(true);
+						boolean v = f.getBoolean(response);
+						if (!v) {
+							wrapper.flushCacheStream();
+						}
+					} catch (SecurityException e) {
+						logger.error("",e);
+					} catch (IllegalArgumentException e) {
+						logger.error("",e);
+					} catch (NoSuchFieldException e) {
+						logger.error("",e);
+					} catch (IllegalAccessException e) {
+						logger.error("",e);
+					}
+				}else {
+					wrapper.flushCacheStream();
+				}
 			}
-		}else {
+		} else {
 			filterChain.doFilter(request, response);
 		}
 	}
 
+	private RespAttrs initRespAttrs(String uri, ResponseWrapper wrapper, BaseErrorException be) {
+		RespAttrs respAttrs;
+		logger.info("path:{} => error_code:{}", uri, be.getErrorCode());
+		respAttrs = attrsSelector.selectExceptionAtts(wrapper, be);
+		return respAttrs;
+	}
+
 	private boolean matchUri(String uri) {
-		for(String uriPattern : ignorePaths) {
-			if(PatternUtil.match(uriPattern, uri)) {
+		for (String uriPattern : ignorePaths) {
+			if (PatternUtil.match(uriPattern, uri)) {
 				return true;
 			}
 		}

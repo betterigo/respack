@@ -11,9 +11,14 @@ import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ResponseWrapper extends HttpServletResponseWrapper {
 
 
+	private static final Logger logger = LoggerFactory.getLogger(ResponseWrapper.class);
+	
     private ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     private PrintWriter printWriter;
     private ServletOutputStream filterOutput;
@@ -64,7 +69,12 @@ public class ResponseWrapper extends HttpServletResponseWrapper {
     }
     
     public void flushCacheStream() throws IOException {
-    	this.servletOutputStream.write(getBytes());
+    	this.servletOutputStream.flush();
+    	if(this.isCommitted()) {    		
+    		this.servletOutputStream.write(getBytes());
+    	}else {
+    		logger.warn("servletOutputStream write has been called");
+    	}
     }
 
     class MyServletOutputStream extends ServletOutputStream {

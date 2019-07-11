@@ -3,6 +3,7 @@ D:\respack\respack-st1\src\main\java\com\troila\cloud\respack\core\ErrorBody.jav
 D:\respack\respack-st1\src\main\java\com\troila\cloud\respack\exception\BaseErrorException.java
 D:\respack\respack-st1\src\main\java\com\troila\cloud\respack\filter\ResponseWrapper.java
 D:\respack\respack-st1\src\main\java\com\troila\cloud\respack\core\ResultPackager.java
+D:\respack\respack-st1\src\main\java\com\troila\cloud\respack\core\CommonStatus.java
 D:\respack\respack-st1\src\main\java\com\troila\cloud\respack\core\RespAttrs.java
 D:\respack\respack-st1\src\main\java\com\troila\cloud\respack\filter\PatternUtil.java
 D:\respack\respack-st1\src\main\java\com\troila\cloud\respack\core\impl\DefaultRespAttrs.java

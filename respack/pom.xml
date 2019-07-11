@@ -5,7 +5,7 @@
 
 	<groupId>com.troila.cloud</groupId>
 	<artifactId>spring-boot-starter-respack</artifactId>
-	<version>2.1.2</version>
+	<version>2.1.4</version>
 	<packaging>jar</packaging>
 
 	<name>respack</name>
@@ -38,12 +38,9 @@
 			<artifactId>spring-boot-starter-jersey</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
-			<scope>provided</scope>
-		</dependency>
+		<!-- <dependency> <groupId>javax.servlet</groupId> <artifactId>javax.servlet-api</artifactId> 
+			<version>3.0.1</version> <optional>true</optional> </dependency> -->
+		<!-- https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-to-slf4j</artifactId>
@@ -69,6 +66,11 @@
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.troila.cloud</groupId>
+			<artifactId>dev.common</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 	</dependencies>
 	<distributionManagement>

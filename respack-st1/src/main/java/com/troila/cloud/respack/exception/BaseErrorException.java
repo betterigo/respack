@@ -1,5 +1,7 @@
 package com.troila.cloud.respack.exception;
 
+import com.troila.cloud.respack.core.CommonStatus;
+
 /**
  * 基本异常类，包装字段中的的err_code将从该异常获得。用户可以继承该异常来自定义自己的异常信息
  * @author haodonglei
@@ -30,6 +32,16 @@ public class BaseErrorException extends RuntimeException{
 	public BaseErrorException(int errorCode,String message) {
 		super(message);
 		this.errorCode = errorCode;
+	}
+	
+	public BaseErrorException(CommonStatus status, String message) {
+		super(message);
+		this.errorCode = status.getValue();
+	}
+	
+	public BaseErrorException(CommonStatus status) {
+		super();
+		this.errorCode = status.getValue();
 	}
 	
 	public BaseErrorException() {

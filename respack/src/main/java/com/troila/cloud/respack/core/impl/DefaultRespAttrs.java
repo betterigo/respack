@@ -9,6 +9,8 @@ public class DefaultRespAttrs implements RespAttrs{
 	private int status;
 	
 	private int errCode;
+	
+	private String message;
 
 	private ConcurrentHashMap<String, String> extInfo = new ConcurrentHashMap<>();
 	
@@ -35,5 +37,13 @@ public class DefaultRespAttrs implements RespAttrs{
 	
 	public String getExtInfo(String k) {
 		return this.extInfo.get(k);
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }

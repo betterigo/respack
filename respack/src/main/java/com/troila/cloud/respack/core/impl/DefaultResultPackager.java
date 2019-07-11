@@ -20,6 +20,7 @@ public class DefaultResultPackager implements ResultPackager<JsonNode>{
 		StandardPackEntity packEntity = new StandardPackEntity();
 		if(attrs instanceof DefaultRespAttrs) {
 			packEntity.setErr_code(((DefaultRespAttrs) attrs).getErrCode());
+			packEntity.setMsg(((DefaultRespAttrs) attrs).getMessage());
 		}
 		packEntity.setStatus(attrs.getStatus());
 		packEntity.setData(data);
