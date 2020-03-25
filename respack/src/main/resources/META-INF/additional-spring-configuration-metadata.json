@@ -30,7 +30,7 @@
 			"name": "respack.filter.settings.max-cache",
 			"type": "java.lang.Integer",
 			"description": "设置结果集的阈值，超过这个阈值就不会包装返回结果；unit:kb",
-			"defaultValue": 1024
-		},
+			"defaultValue": "1024"
+		}
 	]
 }

@@ -36,6 +36,7 @@ import com.troila.cloud.respack.core.ErrorBody;
 import com.troila.cloud.respack.core.ResultPackager;
 import com.troila.cloud.respack.core.impl.DefaultAttrsSelector;
 import com.troila.cloud.respack.core.impl.DefaultResultPackager;
+import com.troila.cloud.respack.core.impl.StringResultPackager;
 import com.troila.cloud.respack.core.impl.proto.ProtoResultPackager;
 import com.troila.cloud.respack.filter.ResultPackFilter;
 import com.troila.cloud.respack.filter.converter.ResultPackConverter;
@@ -79,9 +80,17 @@ public class RespackAutoConfiguration {
 	static class InnerConfig2 {
 
 		@Bean
-		public ResultPackager<JsonNode> createResultPackager() {
+		public ResultPackager<JsonNode> createJsonResultPackager() {
 			ResultPackager<JsonNode> resultPackager = new DefaultResultPackager();
 			logger.info("配置application/json结果集包装器");
+			return resultPackager;
+		}
+		
+		
+		@Bean
+		public StringResultPackager createStringResultPackager() {
+			StringResultPackager resultPackager = new StringResultPackager();
+			logger.info("配置默认结果集包装器");
 			return resultPackager;
 		}
 		
@@ -92,14 +101,22 @@ public class RespackAutoConfiguration {
 			return resultPackager;
 		}
 		
-		
+//		@Bean
+//		public StringResultPackConverter createStringResultPackConverter() {
+//			return new StringResultPackConverter(createStringResultPackager());
+//		}
+//		
 		@Bean
-		public JsonResultPackConverter createJsonResultPackConverter() {
-			return new JsonResultPackConverter(createResultPackager());
+		public JsonResultPackConverter createJsonResultPackConverter(StringResultPackager stringResultPackager) {
+			JsonResultPackConverter converter = new JsonResultPackConverter(createJsonResultPackager());
+			converter.setDefaultResultPackager(stringResultPackager);
+			return converter;
 		}
 		@Bean
-		public ProtoResultPackConverter createProtoResultPackConverter() {
-			return new ProtoResultPackConverter(createProtoResultPackager());
+		public ProtoResultPackConverter createProtoResultPackConverter(StringResultPackager stringResultPackager) {
+			ProtoResultPackConverter converter = new ProtoResultPackConverter(createProtoResultPackager());
+			converter.setDefaultResultPackager(stringResultPackager);
+			return converter;
 		}
 	}
 

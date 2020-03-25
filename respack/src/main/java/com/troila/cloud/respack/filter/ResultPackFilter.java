@@ -77,6 +77,8 @@ public class ResultPackFilter extends OncePerRequestFilter {
 				// 1.获取response中的属性信息
 				respAttrs = attrsSelector.selectResponseAtts(wrapper);
 			} catch (Exception e) {
+				//需要设置返回值的contentType
+				response.setContentType("application/json;charset=utf-8");
 				if (e.getCause() instanceof BaseErrorException) {
 					BaseErrorException be = (BaseErrorException) e.getCause();
 					respAttrs = initRespAttrs(uri, wrapper, be);

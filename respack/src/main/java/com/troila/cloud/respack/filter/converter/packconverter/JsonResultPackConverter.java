@@ -45,7 +45,7 @@ public class JsonResultPackConverter extends AbstractResultPackConverter<JsonNod
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		return null;
 	}
