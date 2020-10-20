@@ -1,5 +1,6 @@
 package com.troila.cloud.respack.exception;
 
+import com.troila.cloud.respack.assertor.ServiceErrorEnum;
 import com.troila.cloud.respack.enums.CommonStatus;
 
 public class BaseErrorException extends RuntimeException{
@@ -27,6 +28,11 @@ public class BaseErrorException extends RuntimeException{
 	public BaseErrorException(int errorCode,String message) {
 		super(message);
 		this.errorCode = errorCode;
+	}
+	
+	public BaseErrorException(ServiceErrorEnum serviceErrorEnum) {
+		super(serviceErrorEnum.getMessage());
+		this.errorCode = serviceErrorEnum.getErrorCode();
 	}
 	
 	public BaseErrorException(CommonStatus status, String message) {

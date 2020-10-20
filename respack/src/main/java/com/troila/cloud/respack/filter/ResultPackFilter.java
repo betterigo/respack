@@ -30,7 +30,9 @@ import com.troila.cloud.respack.filter.converter.ResultPackConverter;
 public class ResultPackFilter extends OncePerRequestFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ResultPackFilter.class);
-	
+	/**
+	 * 当没有指定格式的时候，默认按照json格式处理
+	 */
 	private static final String DefaultContentType = "application/json";
 
 	private AttrsSelector attrsSelector;
