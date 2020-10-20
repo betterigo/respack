@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +30,8 @@ import com.troila.cloud.respack.filter.converter.ResultPackConverter;
 public class ResultPackFilter extends OncePerRequestFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ResultPackFilter.class);
+	
+	private static final String DefaultContentType = "application/json";
 
 	private AttrsSelector attrsSelector;
 
@@ -37,6 +40,7 @@ public class ResultPackFilter extends OncePerRequestFilter {
 	private List<String> ignorePaths;
 
 	private FilterSettings filterSettings;
+	
 
 	ObjectMapper mapper = new ObjectMapper();
 
@@ -59,6 +63,10 @@ public class ResultPackFilter extends OncePerRequestFilter {
 		String contentType = request.getHeader("Accept");
 		if(contentType != null && contentType.equals("*/*")) {
 			contentType = request.getContentType();
+			// 当Accept为Java默认的接收类型，前端又没有给content-type的值时，默认按照json格式处理
+			if(StringUtils.isEmpty(contentType)) {
+				contentType = DefaultContentType;
+			}
 		}
 		ResultPackConverter targetConverter = null;
 		for (ResultPackConverter converter : this.resultPackConverters) {
