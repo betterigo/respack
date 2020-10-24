@@ -14,7 +14,7 @@ public class FilterSettings {
 	
 	private int filterOrder = Integer.MAX_VALUE;
 
-	private int maxCache = 1024;
+	private int maxCache = 1024 * 10; //默认值10M
 	
 	public boolean isEnable() {
 		return enable;

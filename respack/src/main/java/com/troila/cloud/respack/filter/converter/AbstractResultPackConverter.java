@@ -12,6 +12,7 @@ import com.troila.cloud.respack.core.PackEntity;
 import com.troila.cloud.respack.core.RespAttrs;
 import com.troila.cloud.respack.core.ResultPackager;
 import com.troila.cloud.respack.core.impl.StringResultPackager;
+import com.troila.cloud.respack.exception.OverMaxCacheException;
 import com.troila.cloud.respack.filter.ResponseWrapper;
 
 public abstract class AbstractResultPackConverter<T> implements ResultPackConverter {
@@ -51,12 +52,18 @@ public abstract class AbstractResultPackConverter<T> implements ResultPackConver
 		for(String header : response.getHeaderNames()) {
 			respAttrs.setExtInfo(header, response.getHeader(header));
 		}
-		byte[] result = packInternal(wrapper.getBytes(), respAttrs);
+		byte[] result = null;
+		try {
+			result = packInternal(wrapper.getBytes(), respAttrs);
+		} catch (OverMaxCacheException e) {//如果已经超过了最大缓存大小，则直接返回
+			return;
+		}
 		if(result==null) {
 			result = defaultPackInternal(wrapper.getBytes(), respAttrs);
 			response.setContentLength(result.length);
 		}
 		response.getOutputStream().write(result);
+		
 	}
 
 	protected ResultPackager<T> getResultPackager(){
@@ -71,7 +78,7 @@ public abstract class AbstractResultPackConverter<T> implements ResultPackConver
 		this.defaultResultPackager = defaultResultPackager;
 	}
 
-	protected abstract byte[] packInternal(byte[] buffer, RespAttrs respAttrs);
+	protected abstract byte[] packInternal(byte[] buffer, RespAttrs respAttrs) throws OverMaxCacheException;
 	
 	protected byte[] defaultPackInternal(byte[] buffer, RespAttrs respAttrs) {
 		try {

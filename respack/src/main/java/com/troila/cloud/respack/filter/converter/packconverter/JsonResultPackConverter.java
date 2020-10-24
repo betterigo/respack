@@ -7,9 +7,12 @@ import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Objects;
 import com.troila.cloud.respack.core.PackEntity;
 import com.troila.cloud.respack.core.RespAttrs;
 import com.troila.cloud.respack.core.ResultPackager;
+import com.troila.cloud.respack.exception.OverMaxCacheException;
+import com.troila.cloud.respack.filter.ResponseWrapper;
 import com.troila.cloud.respack.filter.converter.AbstractResultPackConverter;
 
 public class JsonResultPackConverter extends AbstractResultPackConverter<JsonNode> {
@@ -35,10 +38,13 @@ public class JsonResultPackConverter extends AbstractResultPackConverter<JsonNod
 	}
 
 	@Override
-	protected byte[] packInternal(byte[] buffer, RespAttrs respAttrs) {
+	protected byte[] packInternal(byte[] buffer, RespAttrs respAttrs) throws OverMaxCacheException {
 		JsonNode root = null;
 		try {
 			String result = new String(buffer, "utf-8");
+			if(Objects.equal(result, ResponseWrapper.OVER_MAX_CACHE)) {
+				throw new OverMaxCacheException();
+			}
 			root = mapper.readTree(result);
 			PackEntity entity = getResultPackager().pack(respAttrs, root);
 			return mapper.writeValueAsBytes(entity);
