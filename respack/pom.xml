@@ -107,6 +107,16 @@
 		Snapshot</name> <url>http://172.27.103.22:8081/repository/local-snapshot-repository/</url> 
 		</snapshotRepository> <repository> <id>localNexus</id> <url>http://172.27.103.22:8081/repository/local-release/</url> 
 		</repository> </distributionManagement> -->
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -122,6 +132,26 @@
 					<executions>
 						<execution>
 							<id>attach-sources</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<configuration>
+						<aggregate>true</aggregate>
+						<charset>UTF-8</charset>
+						<encoding>UTF-8</encoding>
+						<docencoding>UTF-8</docencoding>
+						<!-- 让maven忽视javadoc过程中警告和错误 -->
+						<additionalparam>-Xdoclint:none</additionalparam>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
 							<goals>
 								<goal>jar</goal>
 							</goals>
