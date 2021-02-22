@@ -13,7 +13,8 @@ import com.troila.cloud.respack.core.StandardPackEntity;
  * @author haodonglei
  *
  */
-public class DefaultResultPackager implements ResultPackager<JsonNode>{
+@Deprecated(since = "2021年2月22日，已经不使用jackson进行结果集包装了。该方式在大数据量的时候会有性能问题")
+public class DefaultResultPackager implements ResultPackager<JsonNode, PackEntity>{
 
 	@Override
 	public PackEntity pack(RespAttrs attrs, JsonNode data) {

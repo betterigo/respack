@@ -29,13 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.troila.cloud.respack.config.settings.FilterSettings;
 import com.troila.cloud.respack.core.AttrsSelector;
 import com.troila.cloud.respack.core.ErrorBody;
+import com.troila.cloud.respack.core.PackEntity;
 import com.troila.cloud.respack.core.ResultPackager;
+import com.troila.cloud.respack.core.impl.ByteResultPackager;
 import com.troila.cloud.respack.core.impl.DefaultAttrsSelector;
-import com.troila.cloud.respack.core.impl.DefaultResultPackager;
 import com.troila.cloud.respack.core.impl.StringResultPackager;
 import com.troila.cloud.respack.core.impl.proto.ProtoResultPackager;
 import com.troila.cloud.respack.filter.ResultPackFilter;
@@ -80,8 +80,9 @@ public class RespackAutoConfiguration {
 	static class InnerConfig2 {
 
 		@Bean
-		public ResultPackager<JsonNode> createJsonResultPackager() {
-			ResultPackager<JsonNode> resultPackager = new DefaultResultPackager();
+		public ResultPackager<byte[],byte[]> createJsonResultPackager() {
+//			ResultPackager<JsonNode,PackEntity> resultPackager = new DefaultResultPackager();
+			ByteResultPackager resultPackager = new ByteResultPackager();
 			logger.info("配置application/json结果集包装器");
 			return resultPackager;
 		}
@@ -95,8 +96,8 @@ public class RespackAutoConfiguration {
 		}
 		
 		@Bean
-		public ResultPackager<byte[]> createProtoResultPackager(){
-			ResultPackager<byte[]> resultPackager = new ProtoResultPackager();
+		public ResultPackager<byte[],PackEntity> createProtoResultPackager(){
+			ResultPackager<byte[],PackEntity> resultPackager = new ProtoResultPackager();
 			logger.info("配置application/x-protobuf结果集包装器");
 			return resultPackager;
 		}

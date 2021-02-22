@@ -8,7 +8,7 @@ import com.troila.cloud.respack.core.StandardPackEntity;
 import com.troila.cloud.respack.core.impl.DefaultRespAttrs;
 import com.troila.cloud.respack.core.impl.proto.RespackProto.Respack;
 
-public class ProtoResultPackager implements ResultPackager<byte[]>{
+public class ProtoResultPackager implements ResultPackager<byte[],PackEntity>{
 
 	@Override
 	public PackEntity pack(RespAttrs attrs, byte[] data) {

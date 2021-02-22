@@ -1,21 +1,15 @@
 package com.troila.cloud.respack.filter.converter.packconverter;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Objects;
-import com.troila.cloud.respack.core.PackEntity;
 import com.troila.cloud.respack.core.RespAttrs;
 import com.troila.cloud.respack.core.ResultPackager;
 import com.troila.cloud.respack.exception.OverMaxCacheException;
-import com.troila.cloud.respack.filter.ResponseWrapper;
 import com.troila.cloud.respack.filter.converter.AbstractResultPackConverter;
 
-public class JsonResultPackConverter extends AbstractResultPackConverter<JsonNode> {
+public class JsonResultPackConverter extends AbstractResultPackConverter<byte[],byte[]> {
 	
 	//定义默认编码类型
 	public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
@@ -28,7 +22,7 @@ public class JsonResultPackConverter extends AbstractResultPackConverter<JsonNod
 	}
 
 	
-	public JsonResultPackConverter(ResultPackager<JsonNode> resultPackager) {
+	public JsonResultPackConverter(ResultPackager<byte[],byte[]> resultPackager) {
 		super(resultPackager);
 		this.initSupportMediaTypes();
 	}
@@ -39,21 +33,7 @@ public class JsonResultPackConverter extends AbstractResultPackConverter<JsonNod
 
 	@Override
 	protected byte[] packInternal(byte[] buffer, RespAttrs respAttrs) throws OverMaxCacheException {
-		JsonNode root = null;
-		try {
-			String result = new String(buffer, "utf-8");
-			if(Objects.equal(result, ResponseWrapper.OVER_MAX_CACHE)) {
-				throw new OverMaxCacheException();
-			}
-			root = mapper.readTree(result);
-			PackEntity entity = getResultPackager().pack(respAttrs, root);
-			return mapper.writeValueAsBytes(entity);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-//			e.printStackTrace();
-		}
-		return null;
+			return getResultPackager().pack(respAttrs, buffer);
 	}
 
 }

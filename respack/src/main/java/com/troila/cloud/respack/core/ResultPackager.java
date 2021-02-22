@@ -1,5 +1,5 @@
 package com.troila.cloud.respack.core;
 
-public interface ResultPackager<T>{
-	PackEntity pack(RespAttrs attrs, T data);
+public interface ResultPackager<T,R>{
+	R pack(RespAttrs attrs, T data);
 }
