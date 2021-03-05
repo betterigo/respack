@@ -62,8 +62,8 @@ public abstract class AbstractResultPackConverter<T, R> implements ResultPackCon
 			result = defaultPackInternal(wrapper.getBytes(), respAttrs);
 			response.setContentLength(result.length);
 		}
+		response.setContentLengthLong(result.length);
 		response.getOutputStream().write(result);
-		
 	}
 
 	protected ResultPackager<T,R> getResultPackager(){
