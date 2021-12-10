@@ -1,9 +1,9 @@
 {
 	"groups": [
 		{
-			"sourceType": "com.troila.cloud.respack.config.settings.FilterSettings",
+			"sourceType": "io.github.betterigo.respack.config.settings.FilterSettings",
 			"name": "respack.filter.settings",
-			"type": "com.troila.cloud.respack.config.settings.FilterSettings",
+			"type": "io.github.betterigo.respack.config.settings.FilterSettings",
 			"description":"返回值包装过滤器设置"
 		}
 	],
