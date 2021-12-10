@@ -15,17 +15,17 @@ import com.troila.cloud.respack.core.impl.StringResultPackager;
 import com.troila.cloud.respack.exception.OverMaxCacheException;
 import com.troila.cloud.respack.filter.ResponseWrapper;
 
-public abstract class AbstractResultPackConverter<T> implements ResultPackConverter {
+public abstract class AbstractResultPackConverter<T, R> implements ResultPackConverter {
 	
 	private List<String> supportsMediaTypes = Lists.newArrayList();
 	
-	private ResultPackager<T> resultPackager;
+	private ResultPackager<T,R> resultPackager;
 	
 	private StringResultPackager defaultResultPackager;
 	
 	ObjectMapper mapper = new ObjectMapper();
 	
-	public AbstractResultPackConverter(ResultPackager<T> resultPackager) {
+	public AbstractResultPackConverter(ResultPackager<T,R> resultPackager) {
 		super();
 		this.resultPackager = resultPackager;
 	}
@@ -62,11 +62,11 @@ public abstract class AbstractResultPackConverter<T> implements ResultPackConver
 			result = defaultPackInternal(wrapper.getBytes(), respAttrs);
 			response.setContentLength(result.length);
 		}
+		response.setContentLengthLong(result.length);
 		response.getOutputStream().write(result);
-		
 	}
 
-	protected ResultPackager<T> getResultPackager(){
+	protected ResultPackager<T,R> getResultPackager(){
 		return this.resultPackager;
 	}
 	

@@ -9,7 +9,7 @@ import com.troila.cloud.respack.core.RespAttrs;
 import com.troila.cloud.respack.core.ResultPackager;
 import com.troila.cloud.respack.filter.converter.AbstractResultPackConverter;
 
-public class ProtoResultPackConverter extends AbstractResultPackConverter<byte[]>{
+public class ProtoResultPackConverter extends AbstractResultPackConverter<byte[],PackEntity>{
 
 	//定义默认编码类型
 	public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
@@ -20,7 +20,7 @@ public class ProtoResultPackConverter extends AbstractResultPackConverter<byte[]
 	}
 
 	
-	public ProtoResultPackConverter(ResultPackager<byte[]> resultPackager) {
+	public ProtoResultPackConverter(ResultPackager<byte[],PackEntity> resultPackager) {
 		super(resultPackager);
 		this.initSupportMediaTypes();
 	}

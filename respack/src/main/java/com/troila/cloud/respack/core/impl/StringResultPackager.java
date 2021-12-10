@@ -5,7 +5,7 @@ import com.troila.cloud.respack.core.RespAttrs;
 import com.troila.cloud.respack.core.ResultPackager;
 import com.troila.cloud.respack.core.StandardPackEntity;
 
-public class StringResultPackager implements ResultPackager<String>{
+public class StringResultPackager implements ResultPackager<String,PackEntity>{
 
 	@Override
 	public PackEntity pack(RespAttrs attrs, String data) {
