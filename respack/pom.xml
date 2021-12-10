@@ -107,6 +107,67 @@
 		Snapshot</name> <url>http://172.27.103.22:8081/repository/local-snapshot-repository/</url> 
 		</snapshotRepository> <repository> <id>localNexus</id> <url>http://172.27.103.22:8081/repository/local-release/</url> 
 		</repository> </distributionManagement> -->
+		  <profiles>
+		        <profile>
+		            <id>release</id>
+		            <build>
+		                <plugins>
+		                    <!-- Source -->
+		                    <plugin>
+		                        <groupId>org.apache.maven.plugins</groupId>
+		                        <artifactId>maven-source-plugin</artifactId>
+		                        <version>2.2.1</version>
+		                        <executions>
+		                            <execution>
+		                                <phase>package</phase>
+		                                <goals>
+		                                    <goal>jar-no-fork</goal>
+		                                </goals>
+		                            </execution>
+		                        </executions>
+		                    </plugin>
+		                    <!-- Javadoc -->
+		                    <!-- <plugin>
+		                        <groupId>org.apache.maven.plugins</groupId>
+		                        <artifactId>maven-javadoc-plugin</artifactId>
+		                        <version>2.9.1</version>
+		                        <executions>
+		                            <execution>
+		                                <phase>package</phase>
+		                                <goals>
+		                                    <goal>jar</goal>
+		                                </goals>
+		                            </execution>
+		                        </executions>
+		                    </plugin> -->
+		                    <!-- GPG -->
+		                    <plugin>
+		                        <groupId>org.apache.maven.plugins</groupId>
+		                        <artifactId>maven-gpg-plugin</artifactId>
+		                        <version>1.5</version>
+		                        <executions>
+		                            <execution>
+		                                <phase>verify</phase>
+		                                <goals>
+		                                    <goal>sign</goal>
+		                                </goals>
+		                            </execution>
+		                        </executions>
+		                    </plugin>
+		                </plugins>
+		            </build>
+		            <distributionManagement>
+		                <snapshotRepository>
+		                    <id>sonatype-nexus-snapshots</id>
+		                               <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		                </snapshotRepository>
+		                <repository>
+		                    <id>sonatype-nexus-staging</id>
+		                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		                </repository>
+		            </distributionManagement>
+		        </profile>
+		    </profiles>
 	<build>
 		<pluginManagement>
 			<plugins>
