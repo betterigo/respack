@@ -1,1 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=io.github.betterigo.respack.config.RespackAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=io.github.betterigo.respack.config.RespackWrapperAutoConfiguration,\
+io.github.betterigo.respack.config.RespackAutoConfiguration

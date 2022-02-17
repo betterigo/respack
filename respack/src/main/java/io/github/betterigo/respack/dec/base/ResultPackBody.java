@@ -23,6 +23,7 @@ public class ResultPackBody<T> implements Serializable {
     private int err_code;
 
     //结果对象
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
     //一些额外的描述信息
