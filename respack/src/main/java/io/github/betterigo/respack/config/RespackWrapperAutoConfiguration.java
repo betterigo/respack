@@ -93,7 +93,6 @@ public class RespackWrapperAutoConfiguration {
 		    @ResponseBody
 		    public ResultPackBody<Object> handleException(RuntimeException e,HttpServletResponse response,HandlerMethod m){
 		        ResultPackBody<Object> resultPackBody = new ResultPackBody<>();
-		        WithoutPack unpack = m.getMethodAnnotation(WithoutPack.class);
 		        if(e instanceof BaseErrorException) {
 		        	resultPackBody.setStatus(response.getStatus());
 		        	resultPackBody.setErr_code(((BaseErrorException) e).getErrorCode());

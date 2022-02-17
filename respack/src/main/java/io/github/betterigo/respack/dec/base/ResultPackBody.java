@@ -16,7 +16,12 @@ import java.io.Serializable;
  * @since 2021/12/9 15:12
  */
 public class ResultPackBody<T> implements Serializable {
-    //默认0
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	//默认0
     private int status;
 
     //默认errorCode = 0
