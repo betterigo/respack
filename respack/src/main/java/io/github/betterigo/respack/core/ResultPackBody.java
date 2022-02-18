@@ -6,7 +6,7 @@
  * Date: 2021/12/9 下午3:12
  */
 
-package io.github.betterigo.respack.dec.base;
+package io.github.betterigo.respack.core;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;

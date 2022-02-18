@@ -1,4 +1,4 @@
-package io.github.betterigo.respack.dec.annotation;
+package io.github.betterigo.respack.core.annotation;
 
 import java.lang.annotation.*;
 

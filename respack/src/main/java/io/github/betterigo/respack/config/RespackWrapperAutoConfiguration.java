@@ -1,20 +1,19 @@
 package io.github.betterigo.respack.config;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,14 +21,32 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import io.github.betterigo.respack.dec.annotation.WithoutPack;
-import io.github.betterigo.respack.dec.base.ResultPackBody;
+import io.github.betterigo.respack.config.settings.PackSettings;
+import io.github.betterigo.respack.core.ExceptionPackger;
+import io.github.betterigo.respack.core.ResultPackager;
+import io.github.betterigo.respack.core.impl.DefaultExceptionPackager;
+import io.github.betterigo.respack.core.impl.DefaultResultPackager;
 import io.github.betterigo.respack.exception.BaseErrorException;
 
 @Configuration
 @ConditionalOnProperty(name = "respack.filter.settings.enable", havingValue = "true", matchIfMissing = true)
 public class RespackWrapperAutoConfiguration {
 	
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
+	
+	@ConditionalOnMissingBean(ResultPackager.class)
+	@Bean
+	public ResultPackager<?> createResultPackager(PackSettings settings) {
+		log.info("Init ResultPackager [{}]",DefaultResultPackager.class.getSimpleName());
+		return new DefaultResultPackager(settings);
+	}
+	
+	@ConditionalOnMissingBean(ExceptionPackger.class)
+	@Bean
+	public ExceptionPackger<?> createExceptionPackger(){
+		log.info("Init ExceptionPackger [{}]",DefaultExceptionPackager.class.getSimpleName());
+		return new DefaultExceptionPackager();
+	}
 	/**
 	 * @Description 结果集装饰器
 	 * @author haodonglei
@@ -39,16 +56,17 @@ public class RespackWrapperAutoConfiguration {
 	@ControllerAdvice(annotations = RestController.class)
 	static class ResultPackWrapper implements ResponseBodyAdvice<Object>{
 
-		  private List<MediaType> supportTypes;
+		  	private ExceptionPackger<?> exceptionPackger;
+		  	
+		  	private ResultPackager<?> resultPackager;
+		  	
+		    public ResultPackWrapper(ExceptionPackger<?> exceptionPackger, ResultPackager<?> resultPackager) {
+				super();
+				this.exceptionPackger = exceptionPackger;
+				this.resultPackager = resultPackager;
+			}
 
-		    @PostConstruct
-		    void init(){
-		        supportTypes = new ArrayList<>();
-		        supportTypes.add(new MediaType("application","json"));
-		        supportTypes = Collections.unmodifiableList(supportTypes);
-		    }
-
-		    /**
+			/**
 		     * Whether this component supports the given controller method return type
 		     * and the selected {@code HttpMessageConverter} type.
 		     *
@@ -76,43 +94,13 @@ public class RespackWrapperAutoConfiguration {
 		     */
 		    @Override
 		    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-		        if(canPack(selectedContentType)){
-		        	WithoutPack unpack = returnType.getMethod().getAnnotation(WithoutPack.class);
-		        	if(unpack==null) {		        		
-		        		ServletServerHttpResponse servletServerHttpResponse = (ServletServerHttpResponse) response;
-		        		ResultPackBody<Object> resultPackBody = new ResultPackBody<>();
-		        		resultPackBody.setData(body);
-		        		resultPackBody.setStatus(servletServerHttpResponse.getServletResponse().getStatus());
-		        		return resultPackBody;
-		        	}
-		        }
-		        return body;
+		        return resultPackager.packResult(body, returnType, selectedContentType, selectedConverterType, request, response);
 		    }
 
 		    @ExceptionHandler(BaseErrorException.class)
 		    @ResponseBody
-		    public ResultPackBody<Object> handleException(RuntimeException e,HttpServletResponse response,HandlerMethod m){
-		        ResultPackBody<Object> resultPackBody = new ResultPackBody<>();
-		        if(e instanceof BaseErrorException) {
-		        	resultPackBody.setStatus(response.getStatus());
-		        	resultPackBody.setErr_code(((BaseErrorException) e).getErrorCode());
-		        }
-		        resultPackBody.setMessage(e.getMessage());
-		        return resultPackBody;
-		    }
-
-		    /**
-		     *
-		     * @param mediaType 内容类型
-		     * @return 是否可以构建pack对象
-		     */
-		    private boolean canPack(MediaType mediaType){
-		        for(MediaType mType : supportTypes){
-		            if(mType.includes(mediaType)){
-		                return true;
-		            }
-		        }
-		        return false;
+		    public Object handleException(RuntimeException e,HttpServletRequest request,HttpServletResponse response,HandlerMethod m){
+		        return exceptionPackger.packException((BaseErrorException)e, request, response, m);
 		    }
 	}
 }

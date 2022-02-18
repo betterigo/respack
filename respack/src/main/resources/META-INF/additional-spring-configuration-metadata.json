@@ -1,9 +1,9 @@
 {
 	"groups": [
 		{
-			"sourceType": "io.github.betterigo.respack.config.settings.FilterSettings",
+			"sourceType": "io.github.betterigo.respack.config.settings.PackSettings",
 			"name": "respack.filter.settings",
-			"type": "io.github.betterigo.respack.config.settings.FilterSettings",
+			"type": "io.github.betterigo.respack.config.settings.PackSettings",
 			"description":"返回值包装过滤器设置"
 		}
 	],
@@ -17,20 +17,8 @@
 		{
 			"name": "respack.filter.settings.ignore-paths",
 			"type": "java.lang.String",
-			"description": "不需要包装的url路径，用';'分隔",
+			"description": "不需要包装的url路径，用','分隔",
 			"defaultValue": true
-		},
-		{
-			"name": "respack.filter.settings.filter-order",
-			"type": "java.lang.Integer",
-			"description": "过滤器在过滤链中的次序,默认值为低顺序，值越小，约靠前",
-			"defaultValue": "Integer.MAX_VALUE"
-		},
-		{
-			"name": "respack.filter.settings.max-cache",
-			"type": "java.lang.Integer",
-			"description": "设置结果集的阈值，超过这个阈值就不会包装返回结果；unit:kb",
-			"defaultValue": "10240"
 		}
 	]
 }

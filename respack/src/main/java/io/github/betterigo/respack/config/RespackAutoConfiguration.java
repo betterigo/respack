@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.context.annotation.Configuration;
@@ -23,10 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
+import io.github.betterigo.respack.config.settings.PackSettings;
 import io.github.betterigo.respack.core.ErrorBody;
 
-//@EnableConfigurationProperties({ FilterSettings.class })
-//@ConditionalOnClass({ ResultPackFilter.class })
+@EnableConfigurationProperties({ PackSettings.class })
 @Configuration
 @ConditionalOnProperty(name = "respack.filter.settings.enable", havingValue = "true", matchIfMissing = true)
 public class RespackAutoConfiguration {
