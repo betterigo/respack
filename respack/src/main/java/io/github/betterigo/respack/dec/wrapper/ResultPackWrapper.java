@@ -76,9 +76,6 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
             ResultPackBody<Object> resultPackBody = new ResultPackBody<>();
             resultPackBody.setData(body);
             resultPackBody.setStatus(servletServerHttpResponse.getServletResponse().getStatus());
-//            if(body instanceof String){
-//                return JSON.toJSONString(resultPackBody);
-//            }
             return resultPackBody;
         }
         return body;
