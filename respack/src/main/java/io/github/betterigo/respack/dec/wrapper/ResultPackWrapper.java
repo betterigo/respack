@@ -8,8 +8,13 @@
 
 package io.github.betterigo.respack.dec.wrapper;
 
+import io.github.betterigo.respack.config.settings.FilterSettings;
+import io.github.betterigo.respack.dec.annotation.WithoutPack;
+import io.github.betterigo.respack.dec.base.PatternUtil;
 import io.github.betterigo.respack.dec.base.ResultPackBody;
 import io.github.betterigo.respack.exception.BaseErrorException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -21,6 +26,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -36,11 +44,20 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
 
     private List<MediaType> supportTypes;
 
+    @Autowired
+    private FilterSettings filterSettings;
+    
+    private List<String> ignorePaths;
+    
+    ObjectMapper mapper = new ObjectMapper();
+    
     @PostConstruct
     void init(){
         supportTypes = new ArrayList<>();
         supportTypes.add(new MediaType("application","json"));
+        supportTypes.add(new MediaType("text","plain"));
         supportTypes = Collections.unmodifiableList(supportTypes);
+        ignorePaths = filterSettings.getIgnorePathsList();
     }
 
     /**
@@ -71,11 +88,26 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
      */
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    	WithoutPack noPack = returnType.getMethodAnnotation(WithoutPack.class);
+    	if(noPack!=null) {
+    		return body;
+    	}
+    	String uri = request.getURI().getPath();
+    	if (matchUri(uri)) {
+    		return body;
+    	}
         if(canPack(selectedContentType)){
             ServletServerHttpResponse servletServerHttpResponse = (ServletServerHttpResponse) response;
             ResultPackBody<Object> resultPackBody = new ResultPackBody<>();
             resultPackBody.setData(body);
             resultPackBody.setStatus(servletServerHttpResponse.getServletResponse().getStatus());
+            if(!selectedContentType.isCompatibleWith(MediaType.APPLICATION_JSON)) {            	
+            	try {
+            		return mapper.writeValueAsString(resultPackBody);
+            	} catch (JsonProcessingException e) {
+            		e.printStackTrace();
+            	}
+            }
             return resultPackBody;
         }
         return body;
@@ -102,4 +134,13 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
         }
         return false;
     }
+    
+	private boolean matchUri(String uri) {
+		for (String uriPattern : ignorePaths) {
+			if (PatternUtil.match(uriPattern, uri)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
