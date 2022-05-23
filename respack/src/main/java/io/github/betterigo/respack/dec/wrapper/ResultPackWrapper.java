@@ -86,7 +86,7 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
 
     @ExceptionHandler(BaseErrorException.class)
     @ResponseBody
-    public ResultPackBody<Object> handleException(RuntimeException e){
+    public ResultPackBody<Object> handleException(BaseErrorException e){
         ResultPackBody<Object> resultPackBody = new ResultPackBody<>();
         resultPackBody.setMessage(e.getMessage());
         return resultPackBody;

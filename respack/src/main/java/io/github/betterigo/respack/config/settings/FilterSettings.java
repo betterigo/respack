@@ -12,10 +12,6 @@ public class FilterSettings {
 
 	private String ignorePaths="";
 	
-	private int filterOrder = Integer.MAX_VALUE;
-
-	private int maxCache = 1024 * 10; //默认值10M
-	
 	public boolean isEnable() {
 		return enable;
 	}
@@ -32,24 +28,8 @@ public class FilterSettings {
 		this.ignorePaths = ignorePaths;
 	}
 
-	public int getFilterOrder() {
-		return filterOrder;
-	}
-
-	public void setFilterOrder(int filterOrder) {
-		this.filterOrder = filterOrder;
-	}
-
-	public int getMaxCache() {
-		return maxCache;
-	}
-
-	public void setMaxCache(int maxCache) {
-		this.maxCache = maxCache;
-	}
-
 	public List<String> getIgnorePathsList(){
-		String[] arrayStr = ignorePaths.split(";");
+		String[] arrayStr = ignorePaths.split(",");
 		List<String> result = new ArrayList<>();
 		for(String o:arrayStr) {
 			if(o!=null && !"".equals(o))
