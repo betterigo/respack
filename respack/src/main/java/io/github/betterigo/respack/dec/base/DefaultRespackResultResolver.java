@@ -6,6 +6,9 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.github.betterigo.respack.exception.BaseErrorException;
 
 /**
@@ -15,12 +18,21 @@ import io.github.betterigo.respack.exception.BaseErrorException;
  */
 public class DefaultRespackResultResolver implements RespackResultResolver{
 
+	private ObjectMapper mapper = new ObjectMapper();
+	
 	@Override
 	public Object pack(Object body, MethodParameter returnType, MediaType selectedContentType, ServerHttpRequest request, ServerHttpResponse response) {
 		ServletServerHttpResponse servletServerHttpResponse = (ServletServerHttpResponse) response;
         ResultPackBody<Object> resultPackBody = new ResultPackBody<>();
         resultPackBody.setData(body);
         resultPackBody.setStatus(servletServerHttpResponse.getServletResponse().getStatus());
+        if(selectedContentType.isCompatibleWith(MediaType.TEXT_PLAIN)) {            	
+        	try {
+        		return mapper.writeValueAsString(resultPackBody);
+        	} catch (JsonProcessingException e) {
+        		e.printStackTrace();
+        	}
+        }
         return resultPackBody;
 	}
 

@@ -8,11 +8,11 @@
 
 package io.github.betterigo.respack.dec.wrapper;
 
-import io.github.betterigo.respack.config.settings.FilterSettings;
-import io.github.betterigo.respack.dec.annotation.WithoutPack;
-import io.github.betterigo.respack.dec.base.PatternUtil;
-import io.github.betterigo.respack.dec.base.ResultPackBody;
-import io.github.betterigo.respack.exception.BaseErrorException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
@@ -20,20 +20,19 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import io.github.betterigo.respack.config.settings.FilterSettings;
+import io.github.betterigo.respack.dec.annotation.WithoutPack;
+import io.github.betterigo.respack.dec.base.PatternUtil;
+import io.github.betterigo.respack.dec.base.RespackResultResolver;
+import io.github.betterigo.respack.exception.BaseErrorException;
 
 /**
  * @author hdl
@@ -47,6 +46,9 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
     @Autowired
     private FilterSettings filterSettings;
     
+    @Autowired
+    private RespackResultResolver respackResultResolver;
+    
     private List<String> ignorePaths;
     
     ObjectMapper mapper = new ObjectMapper();
@@ -56,6 +58,7 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
         supportTypes = new ArrayList<>();
         supportTypes.add(new MediaType("application","json"));
         supportTypes.add(new MediaType("text","plain"));
+        supportTypes.add(new MediaType("application","hal+json"));
         supportTypes = Collections.unmodifiableList(supportTypes);
         ignorePaths = filterSettings.getIgnorePathsList();
     }
@@ -97,28 +100,15 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
     		return body;
     	}
         if(canPack(selectedContentType)){
-            ServletServerHttpResponse servletServerHttpResponse = (ServletServerHttpResponse) response;
-            ResultPackBody<Object> resultPackBody = new ResultPackBody<>();
-            resultPackBody.setData(body);
-            resultPackBody.setStatus(servletServerHttpResponse.getServletResponse().getStatus());
-            if(!selectedContentType.isCompatibleWith(MediaType.APPLICATION_JSON)) {            	
-            	try {
-            		return mapper.writeValueAsString(resultPackBody);
-            	} catch (JsonProcessingException e) {
-            		e.printStackTrace();
-            	}
-            }
-            return resultPackBody;
+            return respackResultResolver.pack(body, returnType, selectedContentType, request, response);
         }
         return body;
     }
 
     @ExceptionHandler(BaseErrorException.class)
     @ResponseBody
-    public ResultPackBody<Object> handleException(BaseErrorException e){
-        ResultPackBody<Object> resultPackBody = new ResultPackBody<>();
-        resultPackBody.setMessage(e.getMessage());
-        return resultPackBody;
+    public Object handleException(BaseErrorException e){
+        return respackResultResolver.handleException(e);
     }
 
     /**
