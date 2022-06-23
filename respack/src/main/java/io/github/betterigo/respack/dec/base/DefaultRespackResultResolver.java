@@ -26,7 +26,7 @@ public class DefaultRespackResultResolver implements RespackResultResolver{
         ResultPackBody<Object> resultPackBody = new ResultPackBody<>();
         resultPackBody.setData(body);
         resultPackBody.setStatus(servletServerHttpResponse.getServletResponse().getStatus());
-        if(selectedContentType.isCompatibleWith(MediaType.TEXT_PLAIN)) {            	
+        if(selectedContentType.isCompatibleWith(MediaType.TEXT_PLAIN) || returnType.getGenericParameterType().equals(String.class)) {            	
         	try {
         		return mapper.writeValueAsString(resultPackBody);
         	} catch (JsonProcessingException e) {

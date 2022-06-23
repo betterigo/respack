@@ -29,24 +29,24 @@ public class ServiceAssert {
 	}
 	/**
 	 * <p>Title: isNull</p>
-	 * <p>Description:如果obj为null，则抛出异常 </p>   
+	 * <p>Description:如果obj不为null，则抛出异常 </p>   
 	 * @param obj
 	 * @param serviceErrorEnum
 	 */
 	public static void isNull(Object obj,ServiceErrorEnum serviceErrorEnum) {
-		if(obj == null) {
+		if(obj != null) {
 			throwException(serviceErrorEnum);
 		}
 	}
 	
 	/**
 	 * <p>Title: isNull</p>
-	 * <p>Description:如果obj为null，则抛出异常 </p>   
+	 * <p>Description:如果obj不为null，则抛出异常 </p>   
 	 * @param obj
 	 * @param serviceErrorEnum
 	 */
 	public static void isNull(Object obj,ServiceErrorEnum serviceErrorEnum,Object ...args) {
-		if(obj == null) {
+		if(obj != null) {
 			throwException(serviceErrorEnum,args);
 		}
 	}
@@ -58,19 +58,19 @@ public class ServiceAssert {
 	 * @param serviceEnumSupplier
 	 */
 	public static void isNull(Object obj,Supplier<ServiceErrorEnum> serviceEnumSupplier) {
-		if(obj == null) {
+		if(obj != null) {
 			throwException(nullSafeGet(serviceEnumSupplier));
 		}
 	}
 	
 	/**
 	 * <p>Title: notNull</p>
-	 * <p>Description: 如果obj不为null，则抛出异常</p>   
+	 * <p>Description: 如果obj为null，则抛出异常</p>   
 	 * @param obj
 	 * @param serviceErrorEnum
 	 */
 	public static void notNull(Object obj,ServiceErrorEnum serviceErrorEnum) {
-		if(obj != null) {
+		if(obj == null) {
 			throwException(serviceErrorEnum);
 		}
 	}
@@ -78,12 +78,12 @@ public class ServiceAssert {
 	
 	/**
 	 * <p>Title: notNull</p>
-	 * <p>Description: 如果obj不为null，则抛出异常</p>   
+	 * <p>Description: 如果obj为null，则抛出异常</p>   
 	 * @param obj
 	 * @param serviceErrorEnum
 	 */
 	public static void notNull(Object obj,ServiceErrorEnum serviceErrorEnum,Object ...args) {
-		if(obj != null) {
+		if(obj == null) {
 			throwException(serviceErrorEnum,args);
 		}
 	}
@@ -91,12 +91,12 @@ public class ServiceAssert {
 	
 	/**
 	 * <p>Title: notNull</p>
-	 * <p>Description: 如果obj不为null，则抛出异常</p>   
+	 * <p>Description: 如果obj为null，则抛出异常</p>   
 	 * @param obj
 	 * @param serviceEnumSupplier
 	 */
 	public static void notNull(Object obj,Supplier<ServiceErrorEnum> serviceEnumSupplier) {
-		if(obj != null) {
+		if(obj == null) {
 			throwException(nullSafeGet(serviceEnumSupplier));
 		}
 	}
