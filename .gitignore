@@ -1,3 +1,6 @@
 *.class
 *.html
 respack/target/
+.idea
+demo
+
