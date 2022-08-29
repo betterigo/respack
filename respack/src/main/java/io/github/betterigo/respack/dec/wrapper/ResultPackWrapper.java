@@ -11,9 +11,12 @@ package io.github.betterigo.respack.dec.wrapper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.PostConstruct;
 
+import io.github.betterigo.respack.config.settings.PackPatternAdapter;
+import io.github.betterigo.respack.config.settings.PackPatternMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -28,7 +31,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.github.betterigo.respack.config.settings.FilterSettings;
 import io.github.betterigo.respack.dec.annotation.WithoutPack;
 import io.github.betterigo.respack.dec.base.PatternUtil;
 import io.github.betterigo.respack.dec.base.RespackResultResolver;
@@ -43,11 +45,16 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
 
     private List<MediaType> supportTypes;
 
-    @Autowired
-    private FilterSettings filterSettings;
+//    @Autowired
+//    private FilterSettings filterSettings;
     
     @Autowired
     private RespackResultResolver respackResultResolver;
+
+    @Autowired
+    private PackPatternAdapter packPatternAdapter;
+
+    private boolean blackMode;
     
     private List<String> ignorePaths;
     
@@ -60,7 +67,8 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
         supportTypes.add(new MediaType("text","plain"));
         supportTypes.add(new MediaType("application","hal+json"));
         supportTypes = Collections.unmodifiableList(supportTypes);
-        ignorePaths = filterSettings.getIgnorePathsList();
+        ignorePaths = packPatternAdapter.getPatterns();
+        this.blackMode = Objects.equals(packPatternAdapter.patternMode(), PackPatternMode.BLACK_LIST);
     }
 
     /**
@@ -124,13 +132,14 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
         }
         return false;
     }
-    
+
+
 	private boolean matchUri(String uri) {
 		for (String uriPattern : ignorePaths) {
 			if (PatternUtil.match(uriPattern, uri)) {
-				return true;
+                return blackMode;
 			}
 		}
-		return false;
+		return blackMode ? false : true;
 	}
 }

@@ -1,5 +1,7 @@
 package io.github.betterigo.respack.config;
 
+import io.github.betterigo.respack.config.settings.DefaultPackPatternAdapter;
+import io.github.betterigo.respack.config.settings.PackPatternAdapter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -18,5 +20,11 @@ public class RespackAutoConfiguration {
 	public RespackResultResolver createRespackResultResolver() {
 		return new DefaultRespackResultResolver();
 	}
-	
+
+
+	@ConditionalOnMissingBean(PackPatternAdapter.class)
+	@Bean
+	public PackPatternAdapter createDefaultPackPatternAdapter(FilterSettings filterSettings){
+		return new DefaultPackPatternAdapter(filterSettings);
+	}
 }
