@@ -24,7 +24,7 @@ public class RespackAutoConfiguration {
 
 	@ConditionalOnMissingBean(PackPatternAdapter.class)
 	@Bean
-	public PackPatternAdapter createDefaultPackPatternAdapter(FilterSettings filterSettings){
-		return new DefaultPackPatternAdapter(filterSettings);
+	public PackPatternAdapter createDefaultPackPatternAdapter(){
+		return new DefaultPackPatternAdapter();
 	}
 }

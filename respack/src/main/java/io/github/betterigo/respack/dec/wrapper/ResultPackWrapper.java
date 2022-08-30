@@ -8,15 +8,13 @@
 
 package io.github.betterigo.respack.dec.wrapper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
-import javax.annotation.PostConstruct;
-
+import io.github.betterigo.respack.config.settings.FilterSettings;
 import io.github.betterigo.respack.config.settings.PackPatternAdapter;
 import io.github.betterigo.respack.config.settings.PackPatternMode;
+import io.github.betterigo.respack.dec.annotation.WithoutPack;
+import io.github.betterigo.respack.dec.base.PatternUtil;
+import io.github.betterigo.respack.dec.base.RespackResultResolver;
+import io.github.betterigo.respack.exception.BaseErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -29,12 +27,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.github.betterigo.respack.dec.annotation.WithoutPack;
-import io.github.betterigo.respack.dec.base.PatternUtil;
-import io.github.betterigo.respack.dec.base.RespackResultResolver;
-import io.github.betterigo.respack.exception.BaseErrorException;
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author hdl
@@ -45,8 +42,8 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
 
     private List<MediaType> supportTypes;
 
-//    @Autowired
-//    private FilterSettings filterSettings;
+    @Autowired
+    private FilterSettings filterSettings;
     
     @Autowired
     private RespackResultResolver respackResultResolver;
@@ -57,9 +54,9 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
     private boolean blackMode;
     
     private List<String> ignorePaths;
-    
-    ObjectMapper mapper = new ObjectMapper();
-    
+
+    private List<String> packPatterns;
+
     @PostConstruct
     void init(){
         supportTypes = new ArrayList<>();
@@ -67,7 +64,8 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
         supportTypes.add(new MediaType("text","plain"));
         supportTypes.add(new MediaType("application","hal+json"));
         supportTypes = Collections.unmodifiableList(supportTypes);
-        ignorePaths = packPatternAdapter.getPatterns();
+        packPatterns = packPatternAdapter.getPatterns();
+        ignorePaths = filterSettings.getIgnorePathsList();
         this.blackMode = Objects.equals(packPatternAdapter.patternMode(), PackPatternMode.BLACK_LIST);
     }
 
@@ -99,11 +97,17 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
      */
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-    	WithoutPack noPack = returnType.getMethodAnnotation(WithoutPack.class);
+    	//1. 判断是否被WithoutPack注释
+        WithoutPack noPack = returnType.getMethodAnnotation(WithoutPack.class);
     	if(noPack!=null) {
     		return body;
     	}
     	String uri = request.getURI().getPath();
+        //2. 判断是否是全局屏蔽的路径
+        if(isIgnorePath(uri)){
+            return body;
+        }
+        //3. 判断黑白名单模式中匹配的路径
     	if (matchUri(uri)) {
     		return body;
     	}
@@ -135,11 +139,20 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
 
 
 	private boolean matchUri(String uri) {
-		for (String uriPattern : ignorePaths) {
+		for (String uriPattern : packPatterns) {
 			if (PatternUtil.match(uriPattern, uri)) {
                 return blackMode;
 			}
 		}
-		return blackMode ? false : true;
+		return !blackMode;
 	}
+
+    private boolean isIgnorePath(String uri) {
+        for (String uriPattern : ignorePaths) {
+            if (PatternUtil.match(uriPattern, uri)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

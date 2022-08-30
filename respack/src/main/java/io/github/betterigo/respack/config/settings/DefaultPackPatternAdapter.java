@@ -9,21 +9,9 @@ import org.springframework.util.CollectionUtils;
  */
 public class DefaultPackPatternAdapter extends PackPatternAdapter{
 
-    private FilterSettings filterSettings;
-
-    public DefaultPackPatternAdapter(FilterSettings filterSettings) {
-        this.filterSettings = filterSettings;
-    }
 
     @Override
     protected void config(PatternConfig config) {
-        if(!CollectionUtils.isEmpty(filterSettings.getIgnorePathsList())){
-            config.blackPattern();
-            for(String pattern : filterSettings.getIgnorePathsList()){
-                config.addPattern(pattern);
-            }
-        }else {
-            config.whitePattern().addPattern("/**");
-        }
+        config.whitePattern().addPattern("/**");
     }
 }
