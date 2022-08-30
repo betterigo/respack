@@ -9,7 +9,7 @@
 package io.github.betterigo.respack.dec.wrapper;
 
 import io.github.betterigo.respack.config.settings.FilterSettings;
-import io.github.betterigo.respack.config.settings.PackPatternAdapter;
+import io.github.betterigo.respack.config.settings.PackPatternConfigAdapter;
 import io.github.betterigo.respack.config.settings.PackPatternMode;
 import io.github.betterigo.respack.dec.annotation.WithoutPack;
 import io.github.betterigo.respack.dec.base.PatternUtil;
@@ -49,7 +49,7 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
     private RespackResultResolver respackResultResolver;
 
     @Autowired
-    private PackPatternAdapter packPatternAdapter;
+    private PackPatternConfigAdapter packPatternConfigAdapter;
 
     private boolean blackMode;
     
@@ -64,9 +64,9 @@ public class ResultPackWrapper implements ResponseBodyAdvice<Object> {
         supportTypes.add(new MediaType("text","plain"));
         supportTypes.add(new MediaType("application","hal+json"));
         supportTypes = Collections.unmodifiableList(supportTypes);
-        packPatterns = packPatternAdapter.getPatterns();
+        packPatterns = packPatternConfigAdapter.getPatterns();
         ignorePaths = filterSettings.getIgnorePathsList();
-        this.blackMode = Objects.equals(packPatternAdapter.patternMode(), PackPatternMode.BLACK_LIST);
+        this.blackMode = Objects.equals(packPatternConfigAdapter.patternMode(), PackPatternMode.BLACK_LIST);
     }
 
     /**

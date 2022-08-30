@@ -13,7 +13,7 @@ import static io.github.betterigo.respack.config.settings.PackPatternMode.WHITE_
  * @author hdl
  * @since 2022/8/29 17:22
  */
-public abstract class PackPatternAdapter {
+public abstract class PackPatternConfigAdapter {
 
     private PackPattern packPattern;
 
